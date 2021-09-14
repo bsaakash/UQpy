@@ -27,9 +27,8 @@ krig3.fit(samples=samples, values=values)
 
 
 def test_fit():
-    tmp1 = np.round(krig.corr_model_params, 3) == np.array([1.08])
-    tmp2 = np.round(krig2.corr_model_params, 3) == np.array([1.038])
-    assert tmp1 and tmp2
+    assert np.round(krig.corr_model_params, 3) == np.array([1.08])
+    assert np.round(krig2.corr_model_params, 3) == np.array([1.038])
 
 
 def test_predict():

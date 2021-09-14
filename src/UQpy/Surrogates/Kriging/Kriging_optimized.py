@@ -197,13 +197,16 @@ class Kriging_op:
             n = s.shape[1]
             r__, dr_ = cm(x=s, s=s, params=p0, dt=True)
             try:
-                cc = cholesky(r__ + 2 ** (-52) * np.eye(m), lower=True)
+                cc = cholesky(r__ + (10+m)*2.22*(10 ** (-15)) * np.eye(m), lower=True)
             except np.linalg.LinAlgError:
                 return np.inf, np.zeros(n)
 
             # Product of diagonal terms is negligible sometimes, even when cc exists.
             if np.prod(np.diagonal(cc)) == 0:
                 return np.inf, np.zeros(n)
+
+            eig, vec = np.linalg.eig(r__ + 2.22*(10+m)*(10 ** (-15)) * np.eye(m))
+            cc_eig = vec.dot(np.diag(np.sqrt(eig)))
 
             f__ = np.zeros_like(f)
             for f__col in range(f__.shape[1]):
@@ -289,7 +292,7 @@ class Kriging_op:
             self.corr_model_params = minimizer[t, :]
 
         # Updated Correlation matrix corresponding to MLE estimates of hyperparameters
-        self.R = self.corr_model(x=s_, s=s_, params=self.corr_model_params) + 2 ** (-52) * np.eye(s_.shape[0])
+        self.R = self.corr_model(x=s_, s=s_, params=self.corr_model_params) + (10+s_.shape[0])*10 ** (-16) * np.eye(s_.shape[0])
         # Compute the regression coefficient (solving this linear equation: F * beta = Y)
         c = np.linalg.cholesky(self.R)  # Eq: 3.8, DACE
         c_inv = np.linalg.inv(c)
