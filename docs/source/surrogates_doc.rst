@@ -79,7 +79,7 @@ In ordinary Kriging, the regression model is assumed to take a constant value su
 Universal Kriging
 ~~~~~~~~~~~~~~~~~~~~~
 
-In universal Kriging, the regression model is assumed to take a general functional form. The ``Kriging`` class currenly supports two univeral Kriging models, the linear regression model given by:
+In universal Kriging, the regression model is assumed to take a general functional form. The ``Kriging`` class currenly supports two universal Kriging models, the linear regression model given by:
 
 .. math:: \mathcal{F}(\beta, x) = \beta_0 = \sum_{i=1}^d \beta_i x_i
 
@@ -229,33 +229,31 @@ which are also orthonormal.
 
 PCE Class Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.PCE
+.. autoclass:: UQpy.Surrogates.PolyChaosExp
     :members:
 
 Univariate Orthonormal Polynomials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Different families of univariate polynomials can be used for the PCE method. These polynomials must always be orthonormal with respect to the arbitrary distribution. In UQpy, two families of polynomials are currently available that can be used from their corresponding classes, namely the ``Legendre`` and ``Hermite`` polynomial class, appropriate for data generated from a Uniform and a Normal distribution respectively.
+Different families of univariate polynomials can be used for the PCE method. These polynomials must always be orthonormal with respect to the arbitrary distribution. In UQpy, two families of polynomials are currently available, namely the ``Legendre`` and ``Hermite`` polynomials, which are appropriate for data generated from a Uniform and a Normal distribution respectively.
 
-Polynomials Class Descriptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.Polynomials
-    :members:
-    
-Legendre Class Descriptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.Legendre
-    :members:
-    
-Hermite Class Descriptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.Hermite
+Univariate Chaos Polynomials Class Description
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autoclass:: UQpy.Surrogates.ChaosPolynomial1d
     :members:
 
+Multivariate Orthonormal Polynomials
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Multivariate chaos polynomials are constructed as products of univariate chaos polynomials of given polynomial degrees. These polynomials are orthonormal with respect to the joint probability distribution that characterises the input random variables (RVs), which are assumed to be mutually independent.
+
+Multivariate Chaos Polynomials Class Description
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autoclass:: UQpy.Surrogates.ChaosPolynomialNd
+    :members:
 
 Calculation of the PCE coefficients
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Several methods exist for the calculation of the PCE coefficients. In UQpy, three non-intrusive methods can be used, namely the Least Squares regression (``PolyChaosLstsq`` class), the LASSO regression (``PolyChaosLasso`` class) and Ridge regression (``PolyChaosRidge`` class) methods. 
+Several methods exist for the calculation of the PCE coefficients. In UQpy, three non-intrusive methods can be used, namely least squares regression (``fit_lstsq`` function), LASSO regression (``fit_lasso`` function) and ridge regression (``fit_ridge`` function). 
 
 
 Least Squares Regression 
@@ -269,19 +267,18 @@ If we assume that the system cannot be solved exactly, since the number of equat
 
 where :math:`\| \cdot \|_{2}` is the standard :math:`L^{2}` norm in the :math:`n`-dimensional Eucledian space :math:`\mathbb{R}^{n}`. The above function is also known as the cost function of the linear regression.
 
-The equation may be under-, well-, or over-determined. In the context of Polynomial Chaos Expansion (PCE) the computed vector corresponds to the polynomial coefficients. The above method can be used from the class ``PolyChaosLstsq``.
+The equation may be under-, well-, or over-determined. In the context of Polynomial Chaos Expansion (PCE) the computed vector corresponds to the polynomial coefficients. The above method can be used from the function ``fit_lstsq``.
 
 
-PolyChaosLstsq Class Descriptions
+fit_lstsq Function Description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.PolyChaosLstsq
-    :members:
+.. autofunction:: UQpy.Surrogates.fit_lstsq
 
 
 Lasso Regression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A drawback of using Least Squares regression for calculating the PCE coefficients, is that this method considers all the features (polynomials) to be equally relevant for the prediction. This technique often results to overfitting and complex models that do not have the ability to generalize well on unseen data. For this reason, the Least Absolute Shrinkage and Selection Operator or LASSO can be employed (from the ``PolyChaosLasso`` class). This method, introduces an :math:`L_{1}` penalty term (which encourages sparcity) in the loss function of linear regression as follows
+A drawback of using Least Squares regression for calculating the PCE coefficients, is that this method considers all the features (polynomials) to be equally relevant for the prediction. This technique often results to overfitting and complex models that do not have the ability to generalize well on unseen data. For this reason, the Least Absolute Shrinkage and Selection Operator or LASSO can be employed (from the ``fit_lasso`` function). This method, introduces an :math:`L_{1}` penalty term (which encourages sparcity) in the loss function of linear regression as follows
 
 .. math:: \hat{\beta} = \underset{\beta}{\arg\min} \{ \frac{1}{N} \| y - X \beta \|_{2} + \lambda \| \beta \|_{1} \}
 
@@ -297,10 +294,9 @@ The Lasso regression model needs to be trained on the data, and for this gradien
 where :math:`i` is the iteration step, and :math:`\epsilon` is the learning rate (gradient descent step) with a value larger than zero.
 
 
-PolyChaosLasso Class Descriptions
+fit_lasso Function Description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.PolyChaosLasso
-    :members:
+.. autofunction:: UQpy.Surrogates.fit_lasso
     
     
 Ridge Regression
@@ -312,58 +308,54 @@ Ridge regression (also known as :math:`L_{2}` regularization) is another variati
 
 where :math:`\lambda` is called the regularization strength.
 
-Due to the penalization of terms, Ridge regression constructs models that are less prone to overfitting. The level of penalization is similarly controlled by the hyperparameter :math:`\lambda` and the coefficients are optimized with gradient descent. The Ridge regression method can be used from the ``PolyChaosRidge`` class.
+Due to the penalization of terms, Ridge regression constructs models that are less prone to overfitting. The level of penalization is similarly controlled by the hyperparameter :math:`\lambda` and the coefficients are optimized with gradient descent. The Ridge regression method can be used from the ``fit_ridge`` function.
 
 
-PolyChaosRidge Class Descriptions
+fit_ridge Function Description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.PolyChaosRidge
-    :members:
+.. autofunction:: UQpy.Surrogates.fit_ridge
 
-
-Error Estimation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``ErrorEstimation`` class can be used to estimate the accuracy of the PCE predictor. Here, we compute the generalization error  in the form of the relative mean squared error normalized by the model variance. The user must create an independent validation dataset :math:`[x_{val}, y_{val} = M(x_{val})]` (i.e. a set of inputs and outputs of the computational model). The validation error is computed as
-
-.. math:: \epsilon_{val} = \frac{N-1}{N} \Bigg[\frac{\sum_{i=1}^{N} (M(x_{val}^{(i)}) - M^{PCE}(x_{val}^{(i)}) )^{2} }{\sum_{i=1}^{N} (M(x_{val}^{(i)}) - \hat{\mu}_{Y_{val}})^{2}} \Bigg]
-
-where :math:`\hat{\mu}_{Y_{val}}` is the sample mean value of the validation dataset output. 
-
-In case where the computational model is very expensive, the use of an alternative error measure is recommended, for example the cross-validation error which partitions the existing training dataset into subsets and computes the error as the average of the individual errors of each subset.  
-
-
-ErrorEstimation Class Descriptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.ErrorEstimation
-    :members:
-
-
+    
 Moment Estimation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There exist two tailored functions for the estimation of the first (mean) and second (variance) moments by post-processing the terms of the PCE, namely ``pce_mean`` and ``pce_variance``.
 
-The ``MomentEstimation`` class can be used for the calculation of the first two moments of the PCE model directly from the PCE coefficients. This is possible due to the orthonormality of the polynomial basis. 
-
-The first moment (mean value) is calculated as 
-
-.. math:: \mu_{PCE} = \mathbb{E} [ \mathcal{M}^{PCE}(x)] = y_{0}
-
-where :math:`y_{0}` is the first PCE coefficient associated with the constant term.
-
-The second moment (variance) is calculated as
-
-.. math:: \sigma^{2}_{PCE} = \mathbb{E} [( \mathcal{M}^{PCE}(x) - \mu_{PCE} )^{2} ] = \sum_{i=1}^{p} y_{i}
-
-where :math:`p` is the number of polynomials (first PCE coefficient is excluded).
-
-
-MomentEstimation Class Descriptions
+pce_mean Function Description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.MomentEstimation
-    :members:
-    
+.. autofunction:: UQpy.Surrogates.pce_mean
 
-|
+pce_variance Function Description
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: UQpy.Surrogates.pce_variance
+
+
+
+Sensitivity Analysis
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There exist methods for univariate and multivariate sensitivity analysis (SA). Global, variance-based (Sobol) sensitivity indices are computed by post-processing the PCE terms.
+The methods are:
+``pce_sobol_first``: computes first-order sensitivity indices for a scalar QoI.
+``pce_sobol_total``: computes total-order sensitivity indices for a scalar QoI.
+``pce_generalized_sobol_first``: computes first-order sensitivity indices for a vector-valued QoI.
+``pce_generalized_sobol_total``: computes total-order sensitivity indices for a vector-valued QoI.
+
+pce_sobol_first Function Description
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: UQpy.Surrogates.pce_sobol_first
+
+pce_sobol_total Function Description
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: UQpy.Surrogates.pce_sobol_total
+
+pce_generalized_sobol_first Function Description
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: UQpy.Surrogates.pce_generalized_sobol_first
+
+pce_generalized_sobol_total Function Description
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: UQpy.Surrogates.pce_generalized_sobol_total
+
+
 
 .. [1] M. Grigoriu, “Reduced order models for random functions. Application to stochastic problems”, Applied Mathematical Modelling, Volume 33, Issue 1, Pages 161-175, 2009.
 
