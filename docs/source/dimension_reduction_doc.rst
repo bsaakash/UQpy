@@ -124,7 +124,7 @@ The ``POD`` class is imported using the following command:
 
 One can use the following command to instantiate the class ``POD``
 
-.. autoclass:: UQpy.DimensionReduction.POD
+.. autoclass:: UQpy.DimensionReduction.baseclass.POD
     :members: 
 
 

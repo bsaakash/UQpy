@@ -12,18 +12,19 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('./src/UQpy/docs'))
+
+sys.path.insert(0, os.path.abspath('../../src/UQpy'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'UQpy'
 copyright = '2020, Michael D. Shields'
-author = 'Michael D. Shields, Dimitrs G. Giovanis, Audrey Olivier, B.S. Aakash, Mohit Singh Chauhan, Lohit Vandanapu, ' \
-         'Ketson RM dos Santos'
+author = 'Michael D. Shields, Dimitrs G. Giovanis, Audrey Olivier, B.S. Aakash, Mohit Singh Chauhan, Lohit Vandanapu, '\
+         ' Ketson RM dos Santos'
 
 # The full version, including alpha/beta/rc tags
-release = 'v3.0.3'
+release = 'v3.1.4'
 
 
 # -- General configuration ---------------------------------------------------

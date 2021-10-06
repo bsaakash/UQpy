@@ -229,7 +229,7 @@ which are also orthonormal.
 
 PCE Class Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.PolyChaosExp
+.. autoclass:: UQpy.Surrogates.PCE.PCE.PolyChaosExp
     :members:
 
 Univariate Orthonormal Polynomials
@@ -239,7 +239,7 @@ Different families of univariate polynomials can be used for the PCE method. The
 
 Univariate Chaos Polynomials Class Description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: UQpy.Surrogates.ChaosPolynomial1d
+.. autoclass:: UQpy.Surrogates.PCE.ChaosPolynomials.ChaosPolynomial1d
     :members:
 
 Multivariate Orthonormal Polynomials
@@ -296,7 +296,7 @@ where :math:`i` is the iteration step, and :math:`\epsilon` is the learning rate
 
 fit_lasso Function Description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autofunction:: UQpy.Surrogates.fit_lasso
+.. autofunction:: UQpy.Surrogates.CoefficientFit.fit_lasso
     
     
 Ridge Regression
@@ -348,12 +348,12 @@ pce_sobol_total Function Description
 .. autofunction:: UQpy.Surrogates.pce_sobol_total
 
 pce_generalized_sobol_first Function Description
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autofunction:: UQpy.Surrogates.pce_generalized_sobol_first
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: UQpy.Surrogates.PCE.SobolEstimation.pce_generalized_sobol_first
 
 pce_generalized_sobol_total Function Description
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autofunction:: UQpy.Surrogates.pce_generalized_sobol_total
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: UQpy.Surrogates.PCE.SobolEstimation.pce_generalized_sobol_total
 
 
 
