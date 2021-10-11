@@ -237,9 +237,10 @@ class Kriging:
             self.corr_model_params = minimizer[t, :]
 
         # Updated Correlation matrix corresponding to MLE estimates of hyperparameters
-        self.R = self.corr_model(x=s_, s=s_, params=self.corr_model_params) + 2 ** (-52) * np.eye(s_.shape[0])
+        self.R = self.corr_model(x=s_, s=s_, params=self.corr_model_params)
         # Compute the regression coefficient (solving this linear equation: F * beta = Y)
-        c = np.linalg.cholesky(self.R)  # Eq: 3.8, DACE
+        # Eq: 3.8, DACE
+        c = cholesky(self.R + (10+nsamples)*2 ** (-52) * np.eye(nsamples), lower=True, check_finite=False)
         c_inv = np.linalg.inv(c)
         f_dash = np.linalg.solve(c, self.F)
         y_dash = np.linalg.solve(c, y_)
@@ -270,7 +271,7 @@ class Kriging:
         n = s.shape[1]
         r__, dr_ = cm(x=s, s=s, params=p0, dt=True)
         try:
-            cc = cholesky(r__ + 2 ** (-52) * np.eye(m), lower=True)
+            cc = cholesky(r__ + (10 + m) * 2 ** (-52) * np.eye(m), lower=True, check_finite=False)
         except np.linalg.LinAlgError:
             return np.inf, np.zeros(n)
 
@@ -361,9 +362,9 @@ class Kriging:
             u = np.matmul(self.F_dash.T, r_dash) - fx.T
             norm1 = np.linalg.norm(r_dash, 2, 0)
             norm2 = np.linalg.norm(np.linalg.solve(self.G, u), 2, 0)
-            mse = self.err_var * np.atleast_2d(1 + norm2 - norm1).T
+            mse = np.sqrt(self.err_var * np.atleast_2d(1 + norm2 - norm1).T)
             if self.normalize:
-                mse = self.value_std * np.sqrt(mse)
+                mse = self.value_std * mse
             if x_.shape[1] == 1:
                 mse = mse.flatten()
             return y, mse
