@@ -33,6 +33,7 @@ import scipy.integrate as integrate
 import scipy.special as special
 import itertools, math
 import warnings
+from scipy.linalg import cholesky
 
 warnings.filterwarnings("ignore")
 
@@ -187,67 +188,9 @@ class Kriging:
         ``Kriging`` class.
 
         """
-        from scipy.linalg import cholesky
 
         if self.verbose:
             print('UQpy: Running Kriging.fit')
-
-        def log_likelihood(p0, cm, s, f, y):
-            # Return the log-likelihood function and it's gradient. Gradient is calculate using Central Difference
-            m = s.shape[0]
-            n = s.shape[1]
-            r__, dr_ = cm(x=s, s=s, params=p0, dt=True)
-            try:
-                cc = cholesky(r__ + 2 ** (-52) * np.eye(m), lower=True)
-            except np.linalg.LinAlgError:
-                return np.inf, np.zeros(n)
-
-            # Product of diagonal terms is negligible sometimes, even when cc exists.
-            if np.prod(np.diagonal(cc)) == 0:
-                return np.inf, np.zeros(n)
-
-            cc_inv = np.linalg.inv(cc)
-
-            a =cc_inv.T
-            #r_inv = np.matmul(cc_inv.T, cc_inv)
-            r_inv = cc_inv.T.dot(cc_inv)
-            f__ = cc_inv.dot(f)
-            y__ = cc_inv.dot(y)
-
-            q__, g__ = np.linalg.qr(f__)  # Eq: 3.11, DACE
-
-            # Check if F is a full rank matrix
-            if np.linalg.matrix_rank(g__) != min(np.size(f__, 0), np.size(f__, 1)):
-                raise NotImplementedError("Chosen regression functions are not sufficiently linearly independent")
-
-            # Design parameters
-            beta_ = np.linalg.solve(g__, np.matmul(np.transpose(q__), y__))
-
-            # Computing the process variance (Eq: 3.13, DACE)
-            sigma_ = np.zeros(y.shape[1])
-
-            ll = 0
-            for out_dim in range(y.shape[1]):
-                sigma_[out_dim] = (1 / m) * (np.linalg.norm(y__[:, out_dim] - np.matmul(f__, beta_[:, out_dim])) ** 2)
-                # Objective function:= log(det(sigma**2 * R)) + constant
-                ll = ll + (np.log(np.linalg.det(sigma_[out_dim] * r__)) + m * (np.log(2 * np.pi) + 1)) / 2
-
-            # Gradient of loglikelihood
-            # Reference: C. E. Rasmussen & C. K. I. Williams, Gaussian Processes for Machine Learning, the MIT Press,
-            # 2006, ISBN 026218253X. (Page 114, Eq.(5.9))
-            residual = y - np.matmul(f, beta_)
-            gamma = np.matmul(r_inv, residual)
-            grad_mle = np.zeros(n)
-            for in_dim in range(n):
-                r_inv_derivative = np.matmul(r_inv, np.matmul(dr_[:, :, in_dim], r_inv))
-                tmp = np.matmul(residual.T, np.matmul(r_inv_derivative, residual))
-                for out_dim in range(y.shape[1]):
-                    alpha = gamma / sigma_[out_dim]
-                    tmp1 = np.matmul(alpha, alpha.T) - r_inv / sigma_[out_dim]
-                    cov_der = sigma_[out_dim] * dr_[:, :, in_dim] + tmp * r__ / m
-                    grad_mle[in_dim] = grad_mle[in_dim] - 0.5 * np.trace(np.matmul(tmp1, cov_der))
-
-            return ll, grad_mle
 
         if nopt is not None:
             self.nopt = nopt
@@ -278,7 +221,7 @@ class Kriging:
             starting_point = self.corr_model_params
             minimizer, fun_value = np.zeros([self.nopt, input_dim]), np.zeros([self.nopt, 1])
             for i__ in range(self.nopt):
-                p_ = self.optimizer(log_likelihood, starting_point, args=(self.corr_model, s_, self.F, y_),
+                p_ = self.optimizer(self.log_likelihood, starting_point, args=(self.corr_model, s_, self.F, y_),
                                     **self.kwargs_optimizer)
                 minimizer[i__, :] = p_[0]
                 fun_value[i__, 0] = p_[1]
@@ -319,6 +262,62 @@ class Kriging:
 
         if self.verbose:
             print('UQpy: Kriging fit complete.')
+    
+    @staticmethod
+    def log_likelihood(p0, cm, s, f, y):
+        # Return the log-likelihood function and it's gradient. Gradient is calculate using Central Difference
+        m = s.shape[0]
+        n = s.shape[1]
+        r__, dr_ = cm(x=s, s=s, params=p0, dt=True)
+        try:
+            cc = cholesky(r__ + 2 ** (-52) * np.eye(m), lower=True)
+        except np.linalg.LinAlgError:
+            return np.inf, np.zeros(n)
+
+        # Product of diagonal terms is negligible sometimes, even when cc exists.
+        if np.prod(np.diagonal(cc)) == 0:
+            return np.inf, np.zeros(n)
+
+        cc_inv = np.linalg.inv(cc)
+
+        r_inv = cc_inv.T.dot(cc_inv)
+        f__ = cc_inv.dot(f)
+        y__ = cc_inv.dot(y)
+
+        q__, g__ = np.linalg.qr(f__)  # Eq: 3.11, DACE
+
+        # Check if F is a full rank matrix
+        if np.linalg.matrix_rank(g__) != min(np.size(f__, 0), np.size(f__, 1)):
+            raise NotImplementedError("Chosen regression functions are not sufficiently linearly independent")
+
+        # Design parameters
+        beta_ = np.linalg.solve(g__, np.matmul(np.transpose(q__), y__))
+
+        # Computing the process variance (Eq: 3.13, DACE)
+        sigma_ = np.zeros(y.shape[1])
+
+        ll = 0
+        for out_dim in range(y.shape[1]):
+            sigma_[out_dim] = (1 / m) * (np.linalg.norm(y__[:, out_dim] - np.matmul(f__, beta_[:, out_dim])) ** 2)
+            # Objective function:= log(det(sigma**2 * R)) + constant
+            ll = ll + (np.log(np.linalg.det(sigma_[out_dim] * r__)) + m * (np.log(2 * np.pi) + 1)) / 2
+
+        # Gradient of loglikelihood
+        # Reference: C. E. Rasmussen & C. K. I. Williams, Gaussian Processes for Machine Learning, the MIT Press,
+        # 2006, ISBN 026218253X. (Page 114, Eq.(5.9))
+        residual = y - np.matmul(f, beta_)
+        gamma = np.matmul(r_inv, residual)
+        grad_mle = np.zeros(n)
+        for in_dim in range(n):
+            r_inv_derivative = np.matmul(r_inv, np.matmul(dr_[:, :, in_dim], r_inv))
+            tmp = np.matmul(residual.T, np.matmul(r_inv_derivative, residual))
+            for out_dim in range(y.shape[1]):
+                alpha = gamma / sigma_[out_dim]
+                tmp1 = np.matmul(alpha, alpha.T) - r_inv / sigma_[out_dim]
+                cov_der = sigma_[out_dim] * dr_[:, :, in_dim] + tmp * r__ / m
+                grad_mle[in_dim] = grad_mle[in_dim] - 0.5 * np.trace(np.matmul(tmp1, cov_der))
+
+        return ll, grad_mle
 
     def predict(self, x, return_std=False):
         """
