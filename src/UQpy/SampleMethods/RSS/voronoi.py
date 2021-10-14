@@ -93,8 +93,7 @@ class VoronoiRSS(RSS):
             # --------------------------------
 
             # Compute the gradients at the existing sample points
-            if self.max_train_size is None or len(self.training_points) <= self.max_train_size or \
-                    i == self.samples.shape[0]:
+            if self.max_train_size is None or len(self.training_points) <= self.max_train_size:
                 # Use the entire sample set to train the surrogate model (more expensive option)
                 dy_dx = self.estimate_gradient(np.atleast_2d(self.training_points), qoi, self.mesh.centroids)
             else:
@@ -298,7 +297,7 @@ class VoronoiRSS(RSS):
         i_ = self.samples.shape[0]
         p_ = new_point.shape[0]
         # Update the matrices to have recognize the new point
-        self.points_to_samplesU01 = np.hstack([self.points_to_samplesU01, np.arange(i_, i_ + p_)])
+        self.points_to_samplesU01 = np.hstack([self.points_to_samplesU01, np.arange(i_-1, i_ + p_-1)])
         self.mesh.old_vertices = self.mesh.vertices
 
         # Update the Delaunay triangulation mesh to include the new point.
@@ -333,7 +332,7 @@ class VoronoiRSS(RSS):
                                        self.strata_object.voronoi.vertices[i, :] <= 1 + 1e-10)):
                 self.mesh_vertices = np.vstack(
                     [self.mesh_vertices, self.strata_object.voronoi.vertices[i, :]])
-                self.points_to_samplesU01 = np.hstack([np.array([-1]), self.points_to_samplesU01, ])
+                self.points_to_samplesU01 = np.hstack([self.points_to_samplesU01, np.array([-1])])
 
         # Define the simplex mesh to be used for gradient estimation and sampling
         self.mesh = Delaunay(self.mesh_vertices, furthest_site=False, incremental=True, qhull_options=None)

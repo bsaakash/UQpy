@@ -73,8 +73,7 @@ class RectangularRSS(RSS):
             # --------------------------------
 
             # Compute the gradients at the existing sample points
-            if self.max_train_size is None or len(
-                    self.training_points) <= self.max_train_size or i == self.samples.shape[0]:
+            if self.max_train_size is None or len( self.training_points) <= self.max_train_size:
                 # Use the entire sample set to train the surrogate model (more expensive option)
                 dy_dx[:i] = self.estimate_gradient(np.atleast_2d(self.training_points),
                                                    np.atleast_2d(np.array(qoi)),

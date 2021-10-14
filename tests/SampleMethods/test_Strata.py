@@ -82,10 +82,10 @@ def test_5():
     """
     Test output attributes of strata_vor object.
     """
-    tmp1 = (np.round(strata_vor.seeds, 3) == np.array([[0.464, 0.82], [0.271, 0.599], [0.855, 0.85], [0.197, 0.159],
-                                                       [0.1, 0.416], [0.05, 0.701], [0.704, 0.211],
-                                                       [0.765, 0.557]])).all()
-    tmp2 = (np.round(strata_vor.volume, 3) == np.array([0.161, 0.158, 0.097, 0.128, 0.032, 0.054, 0.249, 0.122])).all()
+    tmp1 = (np.round(strata_vor.seeds, 3) == np.array([[0.137, 0.172], [0.817, 0.559], [0.103, 0.589], [0.452, 0.174],
+                                                       [0.802, 0.166], [0.381, 0.462], [0.361, 0.758],
+                                                       [0.71, 0.896]])).all()
+    tmp2 = (np.round(strata_vor.volume, 3) == np.array([0.091, 0.166, 0.117, 0.117, 0.132, 0.077, 0.175, 0.125])).all()
     assert tmp1 and tmp2
 
 
@@ -100,10 +100,10 @@ def test_voronoi_volume3():
     """
     Test output attributes of strata_vor1 object.
     """
-    tmp1 = (np.round(strata_vor1.seeds, 3) == np.array([[0.551, 0.708], [0.291, 0.511], [0.893, 0.896], [0.126, 0.207],
-                                                        [0.051, 0.441], [0.03, 0.457], [0.649, 0.278],
-                                                        [0.676, 0.591]])).all()
-    tmp2 = (np.round(strata_vor1.volume, 3) == np.array([0.161, 0.158, 0.097, 0.128, 0.032, 0.054, 0.249, 0.122])).all()
+    tmp1 = (np.round(strata_vor1.seeds, 3) == np.array([[0.086, 0.237], [0.801, 0.582], [0.094, 0.433], [0.479, 0.16],
+                                                        [0.735, 0.114], [0.391, 0.517], [0.431, 0.587],
+                                                        [0.738, 0.956]])).all()
+    tmp2 = (np.round(strata_vor1.volume, 3) == np.array([0.091, 0.166, 0.117, 0.117, 0.132, 0.077, 0.175, 0.125])).all()
     assert tmp1 and tmp2
 
 
