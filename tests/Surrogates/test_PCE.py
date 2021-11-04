@@ -36,19 +36,19 @@ def test_1():
     """
     Test td basis
     """
-    assert round(poly_td_func(pce, max_degree)[1].eval_basis(x)[0], 4) == 0.3301
+    assert round(poly_td_func(pce, max_degree)[1].evaluate(x)[0], 4) == -0.2874
 
 def test_2():
     """
     Test tp basis
     """
-    assert round(poly_tp_func(pce, max_degree)[1].eval_basis(x)[0], 4) == 0.3301
+    assert round(poly_tp_func(pce, max_degree)[1].evaluate(x)[0], 4) == -0.2874
 
 def test_3():
     """
     Test PCE coefficients
     """
-    assert round(pce_coeff(pce, x, y)[0][0], 4) == 0.0051
+    assert round(pce_coeff(pce, x, y)[0][0], 4) == 0.2175
 
 def test_4():
     """
@@ -73,11 +73,11 @@ def test_7():
     """
     PCE mean
     """
-    assert round(pce_mean(pce)[0][0], 3) == 0.218
+    assert round(pce_mean(pce)[0], 3) == 0.218
 
 def test_8():
     """
     PCE variance
     """
-    assert round(pce_variance(pce)[0][0], 3) == 0.185
+    assert round(pce_variance(pce)[0], 3) == 0.185
 
