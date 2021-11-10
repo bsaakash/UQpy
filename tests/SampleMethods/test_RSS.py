@@ -7,6 +7,8 @@ from UQpy.RunModel import RunModel
 import numpy as np
 import os
 import pytest
+import glob
+from shutil import rmtree
 
 marginals = [Uniform(loc=0., scale=2.), Uniform(loc=0., scale=1.)]
 strata = RectangularStrata(nstrata=[2, 2])
@@ -15,7 +17,7 @@ y = RectangularRSS(sample_object=x, nsamples=6, n_add=2, random_state=2, verbose
 
 # dir_path = os.path.dirname(os.path.realpath(__file__))
 # filepath = os.path.join(dir_path, 'python_model_function.py')
-rmodel = RunModel(model_script='python_model_function.py', vec='False')
+rmodel = RunModel(model_script='python_model_function.py', vec='False', delete_files=True)
 K = Kriging(reg_model='Linear', corr_model='Exponential', nopt=20, corr_model_params=[1, 1])
 K.fit(samples=x.samples, values=rmodel.qoi_list)
 z = RectangularRSS(sample_object=x, runmodel_object=rmodel, krig_object=K, random_state=2, max_train_size=4,
@@ -27,11 +29,16 @@ x_vor = VoronoiSTS(dist_object=marginals, strata_object=strata_vor, nsamples_per
                    random_state=strata_vor.random_state)
 y_vor = VoronoiRSS(sample_object=x_vor, nsamples=6, n_add=2, verbose=True)
 
-rmodel_ = RunModel(model_script='python_model_function.py', vec='False')
+rmodel_ = RunModel(model_script='python_model_function.py', vec='False', delete_files=True)
 K_ = Kriging(reg_model='Linear', corr_model='Exponential', nopt=20, corr_model_params=[1, 1])
 K_.fit(samples=x_vor.samples, values=rmodel_.qoi_list)
 z_vor = VoronoiRSS(sample_object=x_vor, runmodel_object=rmodel_, krig_object=K_, nsamples=6,
                    random_state=x_vor.random_state, max_train_size=4, verbose=True)
+
+
+dirs = glob.glob('Model_Runs_*')
+for dir_ in dirs:
+    rmtree(dir_)
 
 
 def test_rect_rss():

@@ -16,9 +16,9 @@ K = Kriging(reg_model='Linear', corr_model='Exponential', corr_model_params=np.a
 lf_name = 'Weighted-U'
 # Default values for inbuilt functions
 kw = {"u_stop": 2, "weighted_u_stop": 2, "eff_a": 0, "eff_epsilon": 2, "eff_stop": 0.001, 'eif_stop': 0.01}
-a = AKMCS(runmodel_object=rmodel, krig_object=K, nlearn=10**3, n_add=1,
+a = AKMCS(samples=x.samples, runmodel_object=rmodel, krig_object=K, nlearn=10**3, n_add=1,
           learning_function=lf_name, dist_object=marginals, **kw, random_state=2)
-a.run(nsamples=7, samples=x.samples)
+a.run(nsamples=7)
 
 
 def test_weighted_u():
